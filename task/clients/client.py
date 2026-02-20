@@ -10,8 +10,8 @@ class DialClient(BaseClient):
 
     def __init__(self, deployment_name: str):
         super().__init__(deployment_name)
-        self.client = Dial(base_url=DIAL_ENDPOINT)
-        self.async_client = AsyncDial(base_url=DIAL_ENDPOINT)
+        self.client = Dial(api_key=self._api_key, base_url=DIAL_ENDPOINT)
+        self.async_client = AsyncDial(api_key=self._api_key, base_url=DIAL_ENDPOINT)
 
     def get_completion(self, messages: list[Message]) -> Message:
         completion = self.client.chat.completions.create(
@@ -24,7 +24,7 @@ class DialClient(BaseClient):
             raise Exception("No choices in response found")
         content = completion.choices[0].message.content
         print(content)
-        return Message(role = Role.ASSISTANT, content = content)
+        return Message(role = Role.AI, content = content)
 
     async def stream_completion(self, messages: list[Message]) -> Message:
         chunks = await self.async_client.chat.completions.create(
@@ -40,4 +40,4 @@ class DialClient(BaseClient):
                 print(content, end = "", flush = True)
                 contents.append(content)
         print()
-        return Message(role = Role.ASSISTANT, content = "".join(contents))
+        return Message(role = Role.AI, content = "".join(contents))
